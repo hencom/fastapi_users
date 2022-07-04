@@ -1,0 +1,39 @@
+version: '3.7'
+services:
+
+  db_ehouse_users_app:
+    image: "postgres:14.4-alpine"
+    container_name: db_ehouse_users
+
+    environment:
+      POSTGRES_PASSWORD: 'ehouse2022'
+      POSTGRES_USER: 'ehouseuser'
+      POSTGRES_DB: ' dbusers'
+      PGDATA: /var/lib/postgresql/data
+    # expose:
+    #   - "5433"
+    # ports:
+    #   - "5433:5433"
+    # command: -p 5433
+
+  nginx_ehouse_users_app:
+    image: nginx:latest
+    container_name: nginx_ehouse_users
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+
+  app_ehouse_users:
+    container_name: backend_ehouse_users
+    build:
+      context: ./config/docker
+      dockerfile: ./Dockerfile
+    working_dir: /app
+    command: bash -c "python -m uvicorn main:app --host 0.0.0.0 --port 8002 --reload"
+    volumes:
+      - ./app:/app
+    ports:
+      - "8002:8002"
+    expose:
+      - "8002"

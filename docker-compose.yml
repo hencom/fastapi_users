@@ -1,0 +1,51 @@
+version: '3.7'
+services:
+
+  db_ehouse_users:
+    image: "postgres:14.4-alpine"
+    container_name: dbehouseusers
+
+    environment:
+      POSTGRES_PASSWORD: 'ehouse2022'
+      POSTGRES_USER: 'ehouseuser'
+      POSTGRES_DB: 'dbusers'
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - users_pg_data:/var/lib/postgresql/data
+    networks:
+      - ehouse_network
+
+  # db_ehouse_users:
+  #   extends:
+  #     file: docker-compose-usesr.yml
+  #     service: db_ehouse_users_app
+  #   networks:
+  #     - ehouse_network
+  #   volumes:
+  #     - users_pg_data:/var/lib/postgresql/data
+
+  nginx_ehouse_users:
+    extends:
+      file: docker-compose-usesr.yml
+      service: nginx_ehouse_users_app
+    networks:
+      - ehouse_network
+    depends_on:
+      - backend_ehouse_users
+
+  backend_ehouse_users:
+    extends:
+      file: docker-compose-usesr.yml
+      service: app_ehouse_users
+    networks:
+      - ehouse_network
+    depends_on:
+      - db_ehouse_users
+    cpu_shares: 6
+
+networks:
+  ehouse_network:
+    driver: bridge
+
+volumes:
+  users_pg_data:
