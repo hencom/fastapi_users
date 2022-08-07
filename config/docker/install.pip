@@ -3,3 +3,4 @@ pip install ormar[postgresql]
 pip install "python-jose[cryptography]"
 pip install passlib
 pip install alembic
+pip install pytest

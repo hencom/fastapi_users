@@ -1,7 +1,11 @@
 from fastapi import FastAPI, Request
-from models.models import database, metadata, engine
+from models.db import Base, engine
 
-from routers import users_router, permissions_router, groups_router
+# from services import audit_crud
+
+# from routers__1 import permissions_router
+
+from routers import groups_routers, permissions_routers, users_routers, audit_routers
 
 
 tags_metadata = [
@@ -9,29 +13,29 @@ tags_metadata = [
         "name": "Users",
         "description": "Users",
     },
+    {
+        "name": "Groups",
+        "description": "Groups",
+    },
+    {
+        "name": "Permissions",
+        "description": "Permissions",
+    },
+    {
+        "name": "Audit",
+        "description": "Audit Services",
+    },
 ]
 
 app = FastAPI(
     title="Users and groups",
-    docs_url=f"/ehouse/api/users/docs/",
-    openapi_url=f"/ehouse/api/users/openapi.json",
+    docs_url=f"/ehouse/api/auth/docs/",
+    openapi_url=f"/ehouse/api/auth/openapi.json",
     openapi_tags=tags_metadata,
 )
 
-app.include_router(users_router)
-app.include_router(permissions_router)
-app.include_router(groups_router)
 
-
-@app.get("/ehouse/api/users")
-async def root(request: Request):
-    # print(request.user)
-    return {"message": "users"}
-
-
-@app.on_event("startup")
-async def startup() -> None:
-    # database_ = app.state.database
-    # metadata.create_all(engine)
-    if not database.is_connected:
-        await database.connect()
+app.include_router(users_routers.users_router)
+app.include_router(permissions_routers.permissions_router)
+app.include_router(groups_routers.groups_router)
+app.include_router(audit_routers.audit_router)
