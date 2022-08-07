@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from schemas import schemas
-from services import group_crud, users_crud, audit_crud, async_group_crud
+from services import group_crud, users_crud, audit_crud
 from models import db
 
 groups_router = APIRouter(

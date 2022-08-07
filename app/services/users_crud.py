@@ -34,16 +34,25 @@ def check_password(password: str):
 
 
 def user_exist(db: Session, user: schemas.UserCteate):
-    db_user_exist = (
-        db.query(user_models.User)
-        .filter(
-            or_(
-                user_models.User.username == user.username,
-                user_models.User.email == user.email,
+    if user.email:
+        db_user_exist = (
+            db.query(user_models.User)
+            .filter(
+                or_(
+                    user_models.User.username == user.username,
+                    user_models.User.email == user.email,
+                )
             )
+            .first()
         )
-        .first()
-    )
+    else:
+        db_user_exist = (
+            db.query(user_models.User)
+            .filter(
+                user_models.User.username == user.username,
+            )
+            .first()
+        )
     if db_user_exist:
         raise app_exeptions.exception_duplicate(detail=f"user already exist")
 

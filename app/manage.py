@@ -26,7 +26,7 @@ def ctreate_user(
         last_login_date=db_user.last_login_date,
         joined_date=db_user.joined_date,
         comment=db_user.comment,
-        groups=db_user.groups.all(),
+        groups=db_user.groups,
     )
 
 
@@ -58,14 +58,21 @@ def get_permission(permission_name: str, db: Session):
 def create_permission(permission: schemas.PermissionCreate, db: Session):
     try:
         db_permission = get_permission(permission_name=permission.name, db=db)
+        print(f"Permiision {permission.name} alreadi exist")
     except HTTPException as ex:
-        db_permission = permissions_crud.create_permission(permission=permission, db=db)
-        return schemas.Permission(
-            name=db_permission.name,
-            comment=db_permission.comment,
-            id=db_permission.id,
-            groups=db_permission.groups.all(),
-        )
+        print("------33-----", ex.status_code)
+        if ex.status_code == 404:
+            db_permission = permissions_crud.create_permission(
+                permission=permission, db=db
+            )
+            print(f"Permiision {permission.name} created")
+
+            return schemas.Permission(
+                name=db_permission.name,
+                comment=db_permission.comment,
+                id=db_permission.id,
+                groups=db_permission.groups,
+            )
 
 
 def create_all_permissions():
@@ -168,6 +175,15 @@ def create_all_permissions():
     create_permission(
         permission=schemas.PermissionCreate(
             name="can_delete_groups", comment="can delete groups", group_name_list=None
+        ),
+        db=_db,
+    )
+
+    create_permission(
+        permission=schemas.PermissionCreate(
+            name="test_permission5!!!",
+            comment="can delete groups",
+            group_name_list=None,
         ),
         db=_db,
     )
